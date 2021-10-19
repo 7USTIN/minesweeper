@@ -1,17 +1,18 @@
 <script lang="ts">
-	type difficulty = {
-		flagCount: number;
-		gridSize: number;
-	};
+	import Field from './Field.svelte';
 
-	export let difficulty: difficulty;
+	export let difficulties: {};
+	export let selectedDiff: string;
 	export let time: number;
+
+	$: difficulty = difficulties[selectedDiff];
+	$: grid = generateGrid(difficulty);
 
 	function randomIndex(array: any[]): number {
 		return (array.length * Math.random()) | 0;
 	}
 
-	function generateGrid(difficulty: difficulty): string[] {
+	function generateGrid(difficulty): string[] {
 		let grid = [];
 
 		for (let i = 0; i < difficulty.gridSize; i++) {
@@ -28,21 +29,28 @@
 			if (grid[randomNum[0]][randomNum[1]]) {
 				i--;
 			} else {
-				grid[randomNum[0]][randomNum[1]] = 'X';
+				grid[randomNum[0]][randomNum[1]] = '1';
 			}
 		}
 
 		return grid;
 	}
-
-	$: grid = generateGrid(difficulty);
-
-	$: console.log(...grid);
 </script>
 
 <section>
-	<h1>Grid</h1>
+	<div style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr)`}>
+		{#each grid as row, r (r)}
+			{#each row as field, f (f)}
+				<Field bomb={field} />
+			{/each}
+		{/each}
+	</div>
 </section>
 
 <style lang="scss">
+	section {
+		div {
+			display: grid;
+		}
+	}
 </style>

@@ -17,13 +17,13 @@
 		},
 	};
 
-	let difficulty = difficulties['Medium'];
+	let selectedDiff = localStorage.getItem('selectedDiff') || 'Medium';
 	let time = 0;
 </script>
 
 <main>
-	<Header bind:difficulty {time} {difficulties} />
-	<Grid bind:time {difficulty} />
+	<Header bind:selectedDiff {time} {difficulties} />
+	<Grid bind:time {selectedDiff} {difficulties} />
 </main>
 
 <style lang="scss">

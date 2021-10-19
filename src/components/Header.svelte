@@ -1,15 +1,15 @@
 <script lang="ts">
 	export let difficulties: {};
-	export let difficulty: {};
+	export let selectedDiff: string;
 	export let time: number;
 
-	let selectedDiff = 'Medium';
-
-	$: difficulty = difficulties[selectedDiff];
+	function setLocalStorage() {
+		localStorage.setItem('selectedDiff', selectedDiff);
+	}
 </script>
 
 <header>
-	<select bind:value={selectedDiff}>
+	<select bind:value={selectedDiff} on:change={setLocalStorage}>
 		{#each Object.keys(difficulties) as difficulty, idx (idx)}
 			<option value={difficulty}>{difficulty}</option>
 		{/each}
