@@ -49,6 +49,10 @@
 
 <style lang="scss">
 	section {
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+
 		div {
 			display: grid;
 		}

@@ -17,30 +17,25 @@
 		},
 	};
 
-	let selectedDiff = localStorage.getItem('selectedDiff') || 'Medium';
+	let selectedDiff = localStorage.getItem('selectedDiff') || 'Easy';
 	let time = 0;
 </script>
 
 <main>
-	<Header bind:selectedDiff {time} {difficulties} />
-	<Grid bind:time {selectedDiff} {difficulties} />
+	<div class="wrapper">
+		<Header bind:selectedDiff {time} {difficulties} />
+		<Grid bind:time {selectedDiff} {difficulties} />
+	</div>
 </main>
 
 <style lang="scss">
 	:global(:root) {
-		--bg: #ffffff;
-		--second-bg: #f8f9fa;
-		--text: #151515;
-		--second-text: #59595a;
-		--border: #e4e4e4;
-	}
-
-	:global([data-theme='dark']) {
-		--bg: #151515;
-		--second-bg: #1c1c1c;
-		--text: #ffffff;
-		--second-text: #adadad;
-		--border: #333333;
+		--black: hsl(197, 8%, 8%);
+		--white: hsl(241, 3%, 93%);
+		--white-dark: hsl(241, 3%, 83%);
+		--gray: hsl(208, 7%, 37%);
+		--gray-dark: hsl(197, 6%, 12%);
+		--accent: hsl(193, 95%, 45%);
 	}
 
 	:global(*) {
@@ -54,11 +49,11 @@
 		scroll-behavior: smooth;
 	}
 
-	:global(body, button, input, option) {
+	:global(body, button, input) {
 		font-family: 'Inter', sans-serif;
 		font-size: 14px;
-		background: var(--bg);
-		color: var(--text);
+		background: var(--black);
+		color: var(--white);
 	}
 
 	main {
@@ -68,5 +63,10 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+		
+		.wrapper {
+			display: flex;
+			flex-direction: column;
+		}
 	}
 </style>
