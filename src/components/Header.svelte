@@ -3,26 +3,34 @@
 	export let selectedDiff: string;
 	export let time: number;
 
-	let showDiffSelection = false
+	let showDiffSelection = false;
 
 	function setLocalStorage() {
-		localStorage.setItem('selectedDiff', selectedDiff);
+		localStorage.setItem("selectedDiff", selectedDiff);
 	}
 </script>
 
 <header>
-	<div class="difficulty" on:click={() => showDiffSelection = !showDiffSelection}>
+	<div
+		class="difficulty"
+		on:click={() => (showDiffSelection = !showDiffSelection)}
+	>
 		<p>{selectedDiff}</p>
 		<i class="material-icons">expand_more</i>
 
-		{#if showDiffSelection} 
+		{#if showDiffSelection}
 			<div class="diff-selection">
 				{#each Object.keys(difficulties) as diff, idx (idx)}
-					<div on:click={() => {
-						selectedDiff = diff
-						setLocalStorage()
-					}}>
-						<i class="material-icons" class:selected={selectedDiff === diff}>
+					<div
+						on:click={() => {
+							selectedDiff = diff;
+							setLocalStorage();
+						}}
+					>
+						<i
+							class="material-icons"
+							class:selected={selectedDiff === diff}
+						>
 							done
 						</i>
 						<p>{diff}</p>
@@ -37,10 +45,10 @@
 			<i class="material-icons">outlined_flag</i>
 			<p>{difficulties[selectedDiff].flagCount}</p>
 		</div>
-	
+
 		<div class="time">
 			<i class="material-icons">timer</i>
-			<p>{String(time).padStart(3, '0')}</p>
+			<p>{String(time).padStart(3, "0")}</p>
 		</div>
 	</div>
 </header>
@@ -77,7 +85,7 @@
 				left: 0;
 				z-index: 5;
 				background: var(--white);
-				border-radius: 8px;
+				border-radius: 7px;
 				overflow: hidden;
 				box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
@@ -103,7 +111,7 @@
 					}
 
 					&:hover {
-						background: var(--white-dark)
+						background: var(--white-dark);
 					}
 				}
 			}

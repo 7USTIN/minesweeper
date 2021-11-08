@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Grid from './components/Grid.svelte';
-	import Header from './components/Header.svelte';
+	import Grid from "./components/Grid.svelte";
+	import Header from "./components/Header.svelte";
 
 	const difficulties = {
 		Easy: {
@@ -17,7 +17,7 @@
 		},
 	};
 
-	let selectedDiff = localStorage.getItem('selectedDiff') || 'Easy';
+	let selectedDiff = localStorage.getItem("selectedDiff") || "Easy";
 	let time = 0;
 </script>
 
@@ -50,7 +50,7 @@
 	}
 
 	:global(body, button, input) {
-		font-family: 'Inter', sans-serif;
+		font-family: "Inter", sans-serif;
 		font-size: 14px;
 		background: var(--black);
 		color: var(--white);
@@ -63,7 +63,7 @@
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
-		
+
 		.wrapper {
 			display: flex;
 			flex-direction: column;

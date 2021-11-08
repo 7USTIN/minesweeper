@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Field from './Field.svelte';
+	import Field from "./Field.svelte";
 
 	export let difficulties: {};
 	export let selectedDiff: string;
@@ -19,7 +19,7 @@
 			grid.push([]);
 
 			for (let j = 0; j < difficulty.gridSize; j++) {
-				grid[i].push('');
+				grid[i].push("");
 			}
 		}
 
@@ -29,7 +29,7 @@
 			if (grid[randomNum[0]][randomNum[1]]) {
 				i--;
 			} else {
-				grid[randomNum[0]][randomNum[1]] = '1';
+				grid[randomNum[0]][randomNum[1]] = "1";
 			}
 		}
 
@@ -39,9 +39,9 @@
 
 <section>
 	<div style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr)`}>
-		{#each grid as row, r (r)}
-			{#each row as field, f (f)}
-				<Field bomb={field} />
+		{#each grid as row, rowIdx (rowIdx)}
+			{#each row as field, fieldIdx (fieldIdx)}
+				<Field bomb={field} {rowIdx} {fieldIdx} {grid} />
 			{/each}
 		{/each}
 	</div>
