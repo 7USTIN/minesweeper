@@ -1,34 +1,17 @@
 <script lang="ts">
-	export let bomb: string;
-	export let grid: string[];
-	export let fieldIdx: number;
-	export let rowIdx: number;
-
-	$: neighbours = bomb ? -1 : getNeighbours(grid);
-
-	function getNeighbours(grid: string[]): number {
-		let neighbours = 0;
-
-		for (let i = -1; i < 2; i++) {
-			for (let j = -1; j < 2; j++) {
-				if ([-1, grid.length].includes(rowIdx + i)) {
-					continue;
-				}
-
-				if (grid[rowIdx + i][fieldIdx + j]) {
-					neighbours++;
-				}
-			}
-		}
-
-		return neighbours;
-	}
+	export let bomb: boolean;
+	export let flag: boolean;
+	export let neighbours: number;
 </script>
 
 <div class="wrapper">
 	<div class="field" class:bomb>
-		{#if neighbours > 0}
+		{#if neighbours > 0 && !bomb && !flag}
 			{neighbours}
+		{/if}
+
+		{#if flag}
+			<i class="material-icons">outlined_flag</i>
 		{/if}
 	</div>
 </div>
@@ -54,6 +37,10 @@
 			height: 92.5%;
 			border-radius: 7px;
 			border: 1px solid var(--gray);
+
+			i {
+				font-size: 18px;
+			}
 		}
 	}
 </style>
