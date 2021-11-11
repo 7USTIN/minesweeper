@@ -1,12 +1,18 @@
 <script lang="ts">
+	import { createEventDispatcher } from "svelte";
+
 	export let difficulties: {};
 	export let selectedDiff: string;
-	export let time: number;
+	export let game: { flags: number; time: number };
+
+	const dispatch = createEventDispatcher();
 
 	let showDiffSelection = false;
 
-	function setLocalStorage() {
+	function handleSelection(difficulty: string) {
+		selectedDiff = difficulty;
 		localStorage.setItem("selectedDiff", selectedDiff);
+		dispatch("diffChange");
 	}
 </script>
 
@@ -21,12 +27,7 @@
 		{#if showDiffSelection}
 			<div class="diff-selection">
 				{#each Object.keys(difficulties) as diff, idx (idx)}
-					<div
-						on:click={() => {
-							selectedDiff = diff;
-							setLocalStorage();
-						}}
-					>
+					<div on:click={() => handleSelection(diff)}>
 						<i
 							class="material-icons"
 							class:selected={selectedDiff === diff}
@@ -43,12 +44,12 @@
 	<div class="info">
 		<div class="flags">
 			<i class="material-icons">outlined_flag</i>
-			<p>{difficulties[selectedDiff].flagCount}</p>
+			<p>{difficulties[selectedDiff].flags - game.flags}</p>
 		</div>
 
 		<div class="time">
 			<i class="material-icons">timer</i>
-			<p>{String(time).padStart(3, "0")}</p>
+			<p>{String(game.time).padStart(3, "0")}</p>
 		</div>
 	</div>
 </header>

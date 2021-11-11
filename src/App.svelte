@@ -1,30 +1,108 @@
 <script lang="ts">
-	import Grid from "./components/Grid.svelte";
+	import Cell from "./components/Cell.svelte";
 	import Header from "./components/Header.svelte";
 
 	const difficulties = {
 		Easy: {
-			flagCount: 10,
+			flags: 10,
 			gridSize: 10,
 		},
 		Medium: {
-			flagCount: 40,
+			flags: 40,
 			gridSize: 18,
 		},
 		Hard: {
-			flagCount: 99,
+			flags: 99,
 			gridSize: 25,
 		},
 	};
 
-	let selectedDiff = localStorage.getItem("selectedDiff") || "Easy";
-	let time = 0;
+	let selectedDiff = localStorage.getItem("selectedDiff") || "Medium";
+	let grid = generateGrid();
+	let game = {
+		flags: 0,
+		time: 0,
+	};
+
+	$: difficulty = difficulties[selectedDiff];
+
+	function randomIndex(array: any[]): number {
+		return (array.length * Math.random()) | 0;
+	}
+
+	function generateGrid(): [][] {
+		let difficulty = difficulties[selectedDiff];
+		let grid = [];
+
+		for (let i = 0; i < difficulty.gridSize; i++) {
+			grid.push([]);
+
+			for (let j = 0; j < difficulty.gridSize; j++) {
+				grid[i].push({
+					bomb: false,
+					flag: false,
+					neighbours: 0,
+				});
+			}
+		}
+
+		for (let i = 0; i < difficulty.flags; i++) {
+			let randomNums = [randomIndex(grid), randomIndex(grid)];
+
+			if (grid[randomNums[0]][randomNums[1]].bomb) {
+				i--;
+			} else {
+				grid[randomNums[0]][randomNums[1]] = {
+					bomb: true,
+					flag: false,
+					neighbours: 0,
+				};
+
+				for (let i = -1; i < 2; i++) {
+					for (let j = -1; j < 2; j++) {
+						if ([-1, grid.length].includes(randomNums[0] + i)) {
+							continue;
+						}
+
+						if (grid[randomNums[0] + i][randomNums[1] + j]) {
+							grid[randomNums[0] + i][randomNums[1] + j]
+								.neighbours++;
+						}
+					}
+				}
+			}
+		}
+
+		return grid;
+	}
+
+	function reset() {
+		grid = generateGrid();
+		game = { time: 0, flags: 0 };
+	}
 </script>
 
 <main>
 	<div class="wrapper">
-		<Header bind:selectedDiff {time} {difficulties} />
-		<Grid bind:time {selectedDiff} {difficulties} />
+		<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />
+
+		<section>
+			<div
+				style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr)`}
+			>
+				{#each grid as row, rowIdx (rowIdx)}
+					{#each row as { bomb, flag, neighbours }, fieldIdx (fieldIdx)}
+						<Cell
+							bind:flag
+							bind:game
+							{difficulty}
+							{bomb}
+							{neighbours}
+						/>
+					{/each}
+				{/each}
+			</div>
+		</section>
 	</div>
 </main>
 
@@ -67,6 +145,16 @@
 		.wrapper {
 			display: flex;
 			flex-direction: column;
+		}
+	}
+
+	section {
+		user-select: none;
+		-moz-user-select: none;
+		-webkit-user-select: none;
+
+		div {
+			display: grid;
 		}
 	}
 </style>
