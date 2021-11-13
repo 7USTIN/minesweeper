@@ -1,9 +1,14 @@
 <script lang="ts">
+	import { createEventDispatcher } from "svelte";
+
 	export let bomb: boolean;
 	export let flag: boolean;
+	export let isHidden: boolean;
 	export let neighbours: number;
 	export let difficulty: { flags: number; gridSize: number };
 	export let game: { time: number; flags: number };
+
+	const dispatch = createEventDispatcher();
 
 	function toggleFlag() {
 		if (flag) {
@@ -16,14 +21,18 @@
 	}
 </script>
 
-<div class="wrapper" on:contextmenu|preventDefault={toggleFlag}>
-	<div class="field" class:bomb>
-		{#if neighbours > 0 && !bomb && !flag}
+<div
+	class="wrapper"
+	on:click={() => dispatch("reveal")}
+	on:contextmenu|preventDefault={toggleFlag}
+>
+	<div class="cell" class:bomb class:isHidden>
+		{#if neighbours > 0 && !bomb && !flag && !isHidden}
 			{neighbours}
 		{/if}
 
 		{#if flag}
-			<i class="material-icons">outlined_flag</i>
+			<i class="material-icons">flag</i>
 		{/if}
 	</div>
 </div>
@@ -37,18 +46,24 @@
 		align-items: center;
 		justify-content: center;
 
-		.bomb {
-			background: var(--gray);
+		.isHidden {
+			background: var(--gray-dark) !important;
+			border: 0px solid transparent !important;
 		}
 
-		.field {
+		.bomb {
+			background: lightgrey;
+		}
+
+		.cell {
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			width: 92.5%;
 			height: 92.5%;
 			border-radius: 7px;
-			border: 1px solid var(--gray);
+			border: 2px solid var(--gray-dark);
+			font-weight: 500;
 
 			i {
 				font-size: 18px;

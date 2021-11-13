@@ -43,7 +43,7 @@
 
 	<div class="info">
 		<div class="flags">
-			<i class="material-icons">outlined_flag</i>
+			<i class="material-icons">flag</i>
 			<p>{difficulties[selectedDiff].flags - game.flags}</p>
 		</div>
 
@@ -62,6 +62,7 @@
 		-moz-user-select: none;
 		-webkit-user-select: none;
 		margin-bottom: 16px;
+		width: 100%;
 
 		.difficulty {
 			border-radius: 7px;

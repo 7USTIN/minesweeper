@@ -2,6 +2,13 @@
 	import Cell from "./components/Cell.svelte";
 	import Header from "./components/Header.svelte";
 
+	type cell = {
+		isHidden: boolean;
+		bomb: boolean;
+		flag: boolean;
+		neighbours: number;
+	};
+
 	const difficulties = {
 		Easy: {
 			flags: 10,
@@ -30,7 +37,7 @@
 		return (array.length * Math.random()) | 0;
 	}
 
-	function generateGrid(): [][] {
+	function generateGrid(): cell[][] {
 		let difficulty = difficulties[selectedDiff];
 		let grid = [];
 
@@ -39,6 +46,7 @@
 
 			for (let j = 0; j < difficulty.gridSize; j++) {
 				grid[i].push({
+					isHidden: true,
 					bomb: false,
 					flag: false,
 					neighbours: 0,
@@ -53,6 +61,7 @@
 				i--;
 			} else {
 				grid[randomNums[0]][randomNums[1]] = {
+					isHidden: true,
 					bomb: true,
 					flag: false,
 					neighbours: 0,
@@ -76,6 +85,29 @@
 		return grid;
 	}
 
+	function revealCells(rowIdx: number, cellIdx: number) {
+		grid[rowIdx][cellIdx].isHidden = false;
+
+		if (grid[rowIdx][cellIdx].bomb || grid[rowIdx][cellIdx].neighbours) {
+			return;
+		}
+
+		for (let i = -1; i < 2; i++) {
+			for (let j = -1; j < 2; j++) {
+				if (!grid[rowIdx + i]?.[cellIdx + j]) {
+					break;
+				}
+
+				if (
+					!grid[rowIdx + i][cellIdx + j].bomb &&
+					grid[rowIdx + i][cellIdx + j].isHidden
+				) {
+					revealCells(rowIdx + i, cellIdx + j);
+				}
+			}
+		}
+	}
+
 	function reset() {
 		grid = generateGrid();
 		game = { time: 0, flags: 0 };
@@ -83,27 +115,25 @@
 </script>
 
 <main>
-	<div class="wrapper">
-		<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />
+	<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />
 
-		<section>
-			<div
-				style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr)`}
-			>
-				{#each grid as row, rowIdx (rowIdx)}
-					{#each row as { bomb, flag, neighbours }, fieldIdx (fieldIdx)}
-						<Cell
-							bind:flag
-							bind:game
-							{difficulty}
-							{bomb}
-							{neighbours}
-						/>
-					{/each}
-				{/each}
-			</div>
-		</section>
-	</div>
+	<section
+		style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr);`}
+	>
+		{#each grid as row, rowIdx (rowIdx)}
+			{#each row as { bomb, flag, neighbours, isHidden }, cellIdx (cellIdx)}
+				<Cell
+					on:reveal={() => revealCells(rowIdx, cellIdx)}
+					bind:flag
+					bind:game
+					bind:isHidden
+					{difficulty}
+					{bomb}
+					{neighbours}
+				/>
+			{/each}
+		{/each}
+	</section>
 </main>
 
 <style lang="scss">
@@ -112,8 +142,7 @@
 		--white: hsl(241, 3%, 93%);
 		--white-dark: hsl(241, 3%, 83%);
 		--gray: hsl(208, 7%, 37%);
-		--gray-dark: hsl(197, 6%, 12%);
-		--accent: hsl(193, 95%, 45%);
+		--gray-dark: hsl(197, 6%, 15%);
 	}
 
 	:global(*) {
@@ -123,10 +152,6 @@
 		outline: none;
 	}
 
-	:global(html) {
-		scroll-behavior: smooth;
-	}
-
 	:global(body, button, input) {
 		font-family: "Inter", sans-serif;
 		font-size: 14px;
@@ -134,27 +159,24 @@
 		color: var(--white);
 	}
 
-	main {
+	:global(body) {
 		width: 100vw;
 		height: 100vh;
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
 		align-items: center;
+	}
 
-		.wrapper {
-			display: flex;
-			flex-direction: column;
-		}
+	main {
+		display: flex;
+		flex-direction: column;
 	}
 
 	section {
 		user-select: none;
 		-moz-user-select: none;
 		-webkit-user-select: none;
-
-		div {
-			display: grid;
-		}
+		display: grid;
 	}
 </style>
