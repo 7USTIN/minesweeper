@@ -25,10 +25,12 @@
 	};
 
 	let selectedDiff = localStorage.getItem("selectedDiff") || "Medium";
+	let bombs = [];
 	let grid = generateGrid();
 	let game = {
 		flags: 0,
 		time: 0,
+		state: "IN_GAME",
 	};
 
 	$: difficulty = difficulties[selectedDiff];
@@ -55,27 +57,27 @@
 		}
 
 		for (let i = 0; i < difficulty.flags; i++) {
-			let randomNums = [randomIndex(grid), randomIndex(grid)];
+			let pos = {
+				x: randomIndex(grid),
+				y: randomIndex(grid),
+			};
 
-			if (grid[randomNums[0]][randomNums[1]].bomb) {
+			if (grid[pos.y][pos.x].bomb) {
 				i--;
 			} else {
-				grid[randomNums[0]][randomNums[1]] = {
+				grid[pos.y][pos.x] = {
 					isHidden: true,
 					bomb: true,
 					flag: false,
 					neighbours: 0,
 				};
 
+				bombs.push([pos.y, pos.x]);
+
 				for (let i = -1; i < 2; i++) {
 					for (let j = -1; j < 2; j++) {
-						if ([-1, grid.length].includes(randomNums[0] + i)) {
-							continue;
-						}
-
-						if (grid[randomNums[0] + i][randomNums[1] + j]) {
-							grid[randomNums[0] + i][randomNums[1] + j]
-								.neighbours++;
+						if (grid[pos.y + i]?.[pos.x + j]) {
+							grid[pos.y + i][pos.x + j].neighbours++;
 						}
 					}
 				}
@@ -85,24 +87,32 @@
 		return grid;
 	}
 
-	function revealCells(rowIdx: number, cellIdx: number) {
-		grid[rowIdx][cellIdx].isHidden = false;
-
-		if (grid[rowIdx][cellIdx].bomb || grid[rowIdx][cellIdx].neighbours) {
+	function revealCells(y: number, x: number) {
+		if (game.state !== "IN_GAME" || grid[y][x].flag) {
 			return;
 		}
 
-		for (let i = -1; i < 2; i++) {
-			for (let j = -1; j < 2; j++) {
-				if (!grid[rowIdx + i]?.[cellIdx + j]) {
-					break;
-				}
+		grid[y][x].isHidden = false;
 
-				if (
-					!grid[rowIdx + i][cellIdx + j].bomb &&
-					grid[rowIdx + i][cellIdx + j].isHidden
-				) {
-					revealCells(rowIdx + i, cellIdx + j);
+		if (grid[y][x].bomb) {
+			game.state = "LOST";
+
+			for (const [y, x] of bombs) {
+				grid[y][x].flag = false;
+				grid[y][x].isHidden = false;
+			}
+		}
+
+		if (!grid[y][x].neighbours) {
+			for (let i = -1; i < 2; i++) {
+				for (let j = -1; j < 2; j++) {
+					if (
+						grid[y + i]?.[x + j] &&
+						!grid[y + i][x + j].bomb &&
+						grid[y + i][x + j].isHidden
+					) {
+						revealCells(y + i, x + j);
+					}
 				}
 			}
 		}
@@ -110,7 +120,11 @@
 
 	function reset() {
 		grid = generateGrid();
-		game = { time: 0, flags: 0 };
+		game = {
+			time: 0,
+			flags: 0,
+			state: "IN_GAME",
+		};
 	}
 </script>
 
@@ -120,10 +134,10 @@
 	<section
 		style={`grid-template-columns: repeat(${difficulty.gridSize}, 1fr);`}
 	>
-		{#each grid as row, rowIdx (rowIdx)}
-			{#each row as { bomb, flag, neighbours, isHidden }, cellIdx (cellIdx)}
+		{#each grid as row, y (y)}
+			{#each row as { bomb, flag, neighbours, isHidden }, x (x)}
 				<Cell
-					on:reveal={() => revealCells(rowIdx, cellIdx)}
+					on:reveal={() => revealCells(y, x)}
 					bind:flag
 					bind:game
 					bind:isHidden

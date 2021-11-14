@@ -6,15 +6,19 @@
 	export let isHidden: boolean;
 	export let neighbours: number;
 	export let difficulty: { flags: number; gridSize: number };
-	export let game: { time: number; flags: number };
+	export let game: { time: number; flags: number; state: string };
 
 	const dispatch = createEventDispatcher();
 
 	function toggleFlag() {
+		if (game.state !== "IN_GAME") {
+			return;
+		}
+
 		if (flag) {
 			flag = false;
 			game.flags--;
-		} else if (difficulty.flags - game.flags) {
+		} else if (difficulty.flags - game.flags && isHidden) {
 			flag = true;
 			game.flags++;
 		}
@@ -26,13 +30,18 @@
 	on:click={() => dispatch("reveal")}
 	on:contextmenu|preventDefault={toggleFlag}
 >
-	<div class="cell" class:bomb class:isHidden>
+	<div class="cell" class:isHidden>
 		{#if neighbours > 0 && !bomb && !flag && !isHidden}
 			{neighbours}
 		{/if}
 
 		{#if flag}
 			<i class="material-icons">flag</i>
+		{/if}
+
+		{#if bomb && !isHidden}
+			<i class="material-icons">coronavirus</i>
+			<div class="circle" />
 		{/if}
 	</div>
 </div>
@@ -51,10 +60,6 @@
 			border: 0px solid transparent !important;
 		}
 
-		.bomb {
-			background: lightgrey;
-		}
-
 		.cell {
 			display: flex;
 			align-items: center;
@@ -64,6 +69,14 @@
 			border-radius: 7px;
 			border: 2px solid var(--gray-dark);
 			font-weight: 500;
+
+			.circle {
+				border-radius: 9999px;
+				width: 8px;
+				height: 8px;
+				background: var(--white);
+				position: absolute;
+			}
 
 			i {
 				font-size: 18px;
