@@ -25,13 +25,14 @@
 	};
 
 	let selectedDiff = localStorage.getItem("selectedDiff") || "Medium";
-	let bombs = [];
-	let grid = generateGrid();
 	let game = {
 		flags: 0,
 		time: 0,
 		state: "IN_GAME",
+		bombs: [],
+		revealedNonBombs: 0,
 	};
+	let grid = generateGrid();
 
 	$: difficulty = difficulties[selectedDiff];
 
@@ -72,7 +73,7 @@
 					neighbours: 0,
 				};
 
-				bombs.push([pos.y, pos.x]);
+				game.bombs.push([pos.y, pos.x]);
 
 				for (let i = -1; i < 2; i++) {
 					for (let j = -1; j < 2; j++) {
@@ -88,20 +89,9 @@
 	}
 
 	function revealCells(y: number, x: number) {
-		if (game.state !== "IN_GAME" || grid[y][x].flag) {
-			return;
-		}
-
 		grid[y][x].isHidden = false;
 
-		if (grid[y][x].bomb) {
-			game.state = "LOST";
-
-			for (const [y, x] of bombs) {
-				grid[y][x].flag = false;
-				grid[y][x].isHidden = false;
-			}
-		}
+		checkLose(y, x);
 
 		if (!grid[y][x].neighbours) {
 			for (let i = -1; i < 2; i++) {
@@ -116,17 +106,53 @@
 				}
 			}
 		}
+
+		game.revealedNonBombs++;
+		checkWin();
 	}
+
+	function checkLose(y: number, x: number) {
+		if (grid[y][x].bomb) {
+			game.state = "LOST";
+
+			for (const [y, x] of game.bombs) {
+				grid[y][x].flag = false;
+				grid[y][x].isHidden = false;
+			}
+		}
+	}
+
+	function checkWin() {
+		if (
+			game.revealedNonBombs ===
+			difficulty.gridSize * difficulty.gridSize - game.bombs.length
+		) {
+			game.state = "WON";
+		}
+	}
+
+	function incrementTime() {
+		if (game.state === "IN_GAME" && game.revealedNonBombs) {
+			game.time++;
+		}
+
+		setTimeout(incrementTime, 1000);
+	}
+	incrementTime();
 
 	function reset() {
 		grid = generateGrid();
 		game = {
-			time: 0,
 			flags: 0,
+			time: 0,
 			state: "IN_GAME",
+			bombs: [],
+			revealedNonBombs: 0,
 		};
 	}
 </script>
+
+<p>{game.state}</p>
 
 <main>
 	<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />

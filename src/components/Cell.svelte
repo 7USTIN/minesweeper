@@ -23,11 +23,19 @@
 			game.flags++;
 		}
 	}
+
+	function handleReveal() {
+		if (game.state !== "IN_GAME" || flag || !isHidden) {
+			return;
+		}
+
+		dispatch("reveal");
+	}
 </script>
 
 <div
 	class="wrapper"
-	on:click={() => dispatch("reveal")}
+	on:click={handleReveal}
 	on:contextmenu|preventDefault={toggleFlag}
 >
 	<div class="cell" class:isHidden>
