@@ -141,7 +141,6 @@
 	incrementTime();
 
 	function reset() {
-		grid = generateGrid();
 		game = {
 			flags: 0,
 			time: 0,
@@ -149,10 +148,9 @@
 			bombs: [],
 			revealedNonBombs: 0,
 		};
+		grid = generateGrid();
 	}
 </script>
-
-<p>{game.state}</p>
 
 <main>
 	<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />
@@ -174,13 +172,22 @@
 			{/each}
 		{/each}
 	</section>
+
+	<button
+		class="reset-btn"
+		class:transparent={game.state === "IN_GAME"}
+		on:click={reset}
+	>
+		<i class="material-icons">replay</i>
+		<p>Restart</p>
+	</button>
 </main>
 
 <style lang="scss">
 	:global(:root) {
 		--black: hsl(197, 8%, 8%);
 		--white: hsl(241, 3%, 93%);
-		--white-dark: hsl(241, 3%, 83%);
+		--white-dark: hsl(241, 3%, 85%);
 		--gray: hsl(208, 7%, 37%);
 		--gray-dark: hsl(197, 6%, 15%);
 	}
@@ -211,6 +218,7 @@
 	main {
 		display: flex;
 		flex-direction: column;
+		position: relative;
 	}
 
 	section {
@@ -218,5 +226,33 @@
 		-moz-user-select: none;
 		-webkit-user-select: none;
 		display: grid;
+	}
+
+	.reset-btn {
+		border-radius: 7px;
+		border: 0px solid var(--white);
+		background: var(--white);
+		color: var(--black);
+		padding: 6px 10px;
+		font-size: 16px;
+		cursor: pointer;
+		font-weight: 500;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		margin-top: 16px;
+
+		i {
+			font-size: 20px;
+			margin-right: 8px;
+		}
+
+		&:hover {
+			background: var(--white-dark);
+		}
+	}
+
+	.transparent {
+		opacity: 0;
 	}
 </style>
