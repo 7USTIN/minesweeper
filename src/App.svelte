@@ -153,6 +153,14 @@
 </script>
 
 <main>
+	<a
+		target="_blank"
+		rel="noopener"
+		href="https://github.com/7USTIN/minesweeper"
+	>
+		<i class="material-icons">code</i>
+	</a>
+
 	<Header bind:selectedDiff {game} {difficulties} on:diffChange={reset} />
 
 	<section
@@ -188,7 +196,6 @@
 		--black: hsl(197, 8%, 8%);
 		--white: hsl(241, 3%, 93%);
 		--white-dark: hsl(241, 3%, 85%);
-		--gray: hsl(208, 7%, 37%);
 		--gray-dark: hsl(197, 6%, 15%);
 	}
 
@@ -249,6 +256,23 @@
 
 		&:hover {
 			background: var(--white-dark);
+		}
+	}
+
+	a {
+		position: fixed;
+		top: 32px;
+		right: 64px;
+
+		i {
+			border-radius: 9999px;
+			padding: 8px;
+			color: var(--white);
+			font-size: 24px;
+		}
+
+		&:hover i {
+			background: hsla(241, 3%, 93%, 0.1);
 		}
 	}
 
